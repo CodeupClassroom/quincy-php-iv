@@ -13,4 +13,4 @@ $statement = "CREATE TABLE IF NOT EXISTS albums (
     PRIMARY KEY (id)
 );";
 
-$dbc->exec($statement);
+$connection->exec($statement);

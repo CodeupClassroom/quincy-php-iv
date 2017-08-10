@@ -38,7 +38,7 @@ VALUES
 ('Guns N Roses', 'Appetite for Destruction', '1987', 21300000, 'Heavy metal, hard rock');";
 
 // exec method returns the number of rows affected
-$rowsInserted = $dbc->exec($statement);
+$rowsInserted = $connection->exec($statement);
 
 if($rowsInserted) {
     echo "$rowsInserted number of rows inserted..." . PHP_EOL;
