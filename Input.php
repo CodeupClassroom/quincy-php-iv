@@ -9,8 +9,9 @@ class Input
      * @return boolean whether value exists in $_POST or $_GET
      */
     public static function has($key)
-    {   
-        return isset($_REQUEST[$key]);
+    {
+        $result = isset($_REQUEST[$key]) ? true : false;
+        return $result;
     }
 
     /**
@@ -22,23 +23,13 @@ class Input
      */
     public static function get($key, $default = null)
     {
-        if(self::has($key)) {
-            return $_REQUEST[$key];
-        } else {
-            return $default;
-        }
+        $result = (self::has($key)) ? $_REQUEST[$key] : $default;
+        return $result;
     }
 
-    public static function getNumberic($key, $default = 0)
+    public static function escape($input)
     {
-        $value = self::get($key, $default);
-
-        if(!is_numeric($value)) {
-            return "must be numeric";
-        }
-
-        return $value;
-
+        return htmlspecialchars(strip_tags($input));
     }
 
     ///////////////////////////////////////////////////////////////////////////
