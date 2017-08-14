@@ -16,9 +16,16 @@
 
     function getAllParks($connection, $limit = 2, $offset = 0)
     {
-        $selectString = "SELECT * FROM parks LIMIT $limit OFFSET $offset";
-        $stmt = $connection->query($selectString);         
-        $rows = $stmt->fetchAll(PDO::FETCH_ASSOC);
+        $selectString = "SELECT * FROM parks LIMIT :limit OFFSET :offset";
+
+        $preparedStmt = $connection->prepare($selectString);
+
+        $preparedStmt->bindValue(':limit', (int) $limit, PDO::PARAM_INT);
+        $preparedStmt->bindValue(':offset', (int) $offset, PDO::PARAM_INT);
+
+        $preparedStmt->execute();
+         
+        $rows = $preparedStmt->fetchAll(PDO::FETCH_ASSOC);
         return $rows;
     }
 
@@ -72,7 +79,7 @@
         <div class="row text-center">
             
             <a class="col-lg-4" href="?page=<?=$page?>&recordsPerPage=4">4 Per Page</a>
-            <a class="col-lg-4" href="?page=<?=$page?>&recordsPerPage=10">10 Per Page</a>
+            <a class="col-lg-4" href="?page=1&recordsPerPage=10">10 Per Page</a>
             <a class="col-lg-4" href="?page=1&recordsPerPage=100">100 Per Page</a>
             
         </div>
@@ -84,6 +91,7 @@
                 <h4><strong>State:</strong> <?= $park['location'] ?></h4>
                 <h4><strong>Established:</strong> <?= $park['date_established'] ?></h4>
                 <h4><strong>Area in acres:</strong> <?= $park['area_in_acres'] ?></h4>
+                <h4><strong>Description:</strong> <?= $park['description'] ?></h4>
             </div>
 
         <?php endforeach; ?>
