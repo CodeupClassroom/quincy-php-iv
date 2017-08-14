@@ -1,8 +1,8 @@
 <?php
-require_once "../env.php";
+require_once "../park_logins.php";
 require_once "../db_connect.php";
 
-$message = $dbc->getAttribute(PDO::ATTR_CONNECTION_STATUS) . "\n";
+$message = $connection->getAttribute(PDO::ATTR_CONNECTION_STATUS) . "\n";
 
 ?>
 <!DOCTYPE html>
