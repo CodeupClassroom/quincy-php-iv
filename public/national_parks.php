@@ -1,36 +1,9 @@
 <?php 
 
-    require_once __DIR__ . "/../park_logins.php";
-    require_once __DIR__ . "/../db_connect.php";
     require_once __DIR__ . "/../Input.php";
-    
+    require_once __DIR__ . "/../Park.php";
 
-    function getParksCount($connection) {
-
-        $countQuery = "SELECT COUNT(*) FROM parks";
-        $stmt = $connection->query($countQuery);
-        $count = (int) $stmt->fetchColumn();
-
-        return $count;
-
-    }
-
-    function getAllParks($connection, $limit = 2, $offset = 0)
-    {
-        $selectString = "SELECT * FROM parks ORDER BY name LIMIT :limit OFFSET :offset";
-
-        $preparedStmt = $connection->prepare($selectString);
-
-        $preparedStmt->bindValue(':limit', (int) $limit, PDO::PARAM_INT);
-        $preparedStmt->bindValue(':offset', (int) $offset, PDO::PARAM_INT);
-
-        $preparedStmt->execute();
-         
-        $rows = $preparedStmt->fetchAll(PDO::FETCH_ASSOC);
-        return $rows;
-    }
-
-    function addPark($connection)
+    function addPark()
     {
         $name = Input::get('name');
         $location = Input::get('location');
@@ -45,40 +18,36 @@
             return;
         }
 
-        $insert = "INSERT INTO parks (name, location, area_in_acres, date_established, description) VALUES (:name, :location, :area_in_acres, :date_established, :description);";
-
-        $statement = $connection->prepare($insert);
-
-        $statement->bindValue(':name', $name, PDO::PARAM_STR);
-        $statement->bindValue(':location', $location, PDO::PARAM_STR);
-        $statement->bindValue(':area_in_acres', $area_in_acres, PDO::PARAM_STR);
-        $statement->bindValue(':date_established', $date_established, PDO::PARAM_STR);
-        $statement->bindValue(':description', $description, PDO::PARAM_STR);
-
-        $statement->execute();
+        $park = new Park();
+        $park->name = $name;
+        $park->location = $location;
+        $park->areaInAcres = $area_in_acres;
+        $park->dateEstablished = $date_established;
+        $park->description = $description;
+        $park->insert();
     }
 
-    function pageController($connection)
+    function pageController()
     {
         $data = [];
 
         if(!empty($_POST)) {
-            addPark($connection);
+            addPark();
         }
 
         $page = Input::escape(Input::get('page', 1));
         $recordsPerPage = Input::escape(Input::get('recordsPerPage', 4));
-        $parks = getAllParks($connection, $recordsPerPage, (($page - 1) * $recordsPerPage));
+        $parks = Park::paginate($page, $recordsPerPage);
 
         $data["page"] = $page;
         $data["parks"] = $parks;
         $data["recordsPerPage"] = $recordsPerPage;
-        $data['parksCount'] = getParksCount($connection);
+        $data['parksCount'] = Park::count();
 
         return $data;
     }
 
-    extract(pageController($connection));
+    extract(pageController());
 
 ?>
 
@@ -124,11 +93,11 @@
             <?php foreach($parks as $park) : ?>
                   
                 <div class="well text-center">
-                    <h3><?= $park['name'] ?></h3>
-                    <h4><strong>State:</strong> <?= $park['location'] ?></h4>
-                    <h4><strong>Established:</strong> <?= $park['date_established'] ?></h4>
-                    <h4><strong>Area in acres:</strong> <?= $park['area_in_acres'] ?></h4>
-                    <h4><strong>Description:</strong> <?= $park['description'] ?></h4>
+                    <h3><?= Input::escape($park->name) ?></h3>
+                    <h4><strong>State:</strong> <?= Input::escape($park->location) ?></h4>
+                    <h4><strong>Established:</strong> <?= Input::escape($park->dateEstablished) ?></h4>
+                    <h4><strong>Area in acres:</strong> <?= Input::escape($park->areaInAcres) ?></h4>
+                    <h4><strong>Description:</strong> <?= Input::escape($park->description) ?></h4>
                 </div>
 
             <?php endforeach; ?>

@@ -128,8 +128,23 @@ class Park
 
         $preparedStmt->execute();
 
-        return $preparedStmt->fetchAll(PDO::FETCH_OBJ);
+        $results = $preparedStmt->fetchAll(PDO::FETCH_ASSOC);
 
+        $output = [];
+
+        foreach($results as $result) {
+            $park = new Park();
+            $park->id = $result['id'];
+            $park->name = $result['name'];
+            $park->location = $result['location'];
+            $park->dateEstablished = $result['date_established'];
+            $park->areaInAcres = $result['area_in_acres'];
+            $park->description = $result['description'];
+
+            $output[] = $park;
+        }
+
+        return $output;
 
     }
 
