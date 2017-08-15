@@ -1,17 +1,57 @@
 <?php
 
-require_once __DIR__ . "/../Park.php";
+require_once "Park.php";
 
-// $park = new Park();
+// test dbConnect() and Park::$connection
 
-// $park->name = "Frio River Park";
-// $park->location = "Texas";
-// $park->area_in_acres = 700;
-// $park->date_established = '1913-02-02';
-// $park->insert();
+	// Park::dbConnect();
+	// var_dump(Park::$connection);
 
 
-echo "There are " . Park::count() . " parks on the parks database.";
+// test Park::count()
+	
+	// echo "There are " . Park::count() . " parks in the parks table.";
 
-$parks = Park::all();
-var_dump($parks);
+
+// test Park::all()
+
+	// var_dump(Park::all());
+
+	// $allParks = Park::all();
+
+	// echo "Park 1 details..." . PHP_EOL;
+	// echo $allParks[0]->id . PHP_EOL;
+	// echo $allParks[0]->name . PHP_EOL;
+	// echo $allParks[0]->location . PHP_EOL;
+	// echo $allParks[0]->dateEstablished . PHP_EOL;
+	// echo $allParks[0]->areaInAcres . PHP_EOL;
+	// echo $allParks[0]->description . PHP_EOL;
+
+
+
+// test Park::paginate()
+
+	// print_r(Park::paginate(1));
+	// print_r(Park::paginate(2));
+	// print_r(Park::paginate(2, 2));
+	// print_r(Park::paginate(1, 8));
+
+
+
+// test inserting a new park
+
+$park = new Park();
+
+$park->name = "Frio River Park";
+$park->location = "Texas";
+$park->areaInAcres = 700;
+$park->dateEstablished = '1913-02-02';
+$park->description = 'Yadda yadda';
+$park->insert();
+
+echo $park->id;
+
+
+
+
+

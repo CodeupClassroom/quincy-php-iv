@@ -86,14 +86,15 @@ class Park
         $statement = self::$connection->query($select);
         
         $results = $statement->fetchAll(PDO::FETCH_ASSOC);
+
         $parks = [];
         foreach($results as $result) {
             $park = new Park();
             $park->id = $result['id'];
             $park->name = $result['name'];
             $park->location = $result['location'];
-            $park->area_in_acres = $result['area_in_acres'];
-            $park->date_established = $result['date_established'];
+            $park->areaInAcres = $result['area_in_acres'];
+            $park->dateEstablished = $result['date_established'];
             $park->description = $result['description'];
 
             $parks[] = $park;
@@ -113,6 +114,23 @@ class Park
         // TODO: use the $connection static property to query the database with the
         //       calculated limit and offset
         // TODO: return an array of the found Park objects
+
+        self::dbConnect();
+        $limit = $resultsPerPage;
+        $offset = ($pageNo * $resultsPerPage) - $resultsPerPage;
+
+        $paginateQuery = "SELECT * FROM parks ORDER BY name LIMIT :limit OFFSET :offset";
+
+        $preparedStmt = self::$connection->prepare($paginateQuery);
+
+        $preparedStmt->bindValue(":limit", (int) $limit, PDO::PARAM_INT);
+        $preparedStmt->bindValue(":offset", (int) $offset, PDO::PARAM_INT);
+
+        $preparedStmt->execute();
+
+        return $preparedStmt->fetchAll(PDO::FETCH_OBJ);
+
+
     }
 
     /////////////////////////////////////
@@ -140,6 +158,31 @@ class Park
         //       the prepared statement
         // TODO: excute the statement and set the $id property of this object to
         //       the newly created id
+
+        self::dbConnect();
+
+        $insertQuery = "INSERT INTO parks (name, location, date_established, area_in_acres, description) VALUES(:name, :location, :date_established, :area_in_acres, :description)";
+
+        $stmt = self::$connection->prepare($insertQuery);
+
+        $stmt->bindValue(":name", $this->name, PDO::PARAM_STR);
+        $stmt->bindValue(":location", $this->location, PDO::PARAM_STR);
+        $stmt->bindValue(":date_established", $this->dateEstablished, PDO::PARAM_STR);
+        $stmt->bindValue(":area_in_acres", $this->areaInAcres, PDO::PARAM_STR);
+        $stmt->bindValue(":description", $this->description, PDO::PARAM_STR);
+    
+        $stmt->execute();
+
+        $this->id = self::$connection->lastInsertId();
+
+
+
+
+
+
+
+
+
 
 
     }
