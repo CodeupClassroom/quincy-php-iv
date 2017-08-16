@@ -13,10 +13,10 @@
 
         $date_established = date('Y-m-d', strtotime($date_established));
 
-        if(!is_numeric($area_in_acres)) {
-            echo "Area in acres must be numeric";
-            return;
-        }
+        // if(!is_numeric($area_in_acres)) {
+        //     echo "Area in acres must be numeric";
+        //     return;
+        // }
 
         $park = new Park();
         $park->name = $name;
@@ -24,15 +24,21 @@
         $park->areaInAcres = $area_in_acres;
         $park->dateEstablished = $date_established;
         $park->description = $description;
+
         $park->insert();
     }
 
     function pageController()
     {
         $data = [];
+        $data['message'] = "";
 
         if(!empty($_POST)) {
-            addPark();
+            try {
+                addPark();
+            } catch (Exception $e) {
+                $data['message'] = "Something went wrong. " . $e->getMessage();
+            }
         }
 
         $page = Input::escape(Input::get('page', 1));
@@ -80,6 +86,7 @@
     <main class="container">
         
         <h1 class="text-center">National Parks</h1>
+        <h2><?php if(!empty($message)) { echo $message; } ?></h2>
 
 
         <section class="col-md-8">

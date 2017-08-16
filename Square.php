@@ -5,6 +5,9 @@ require_once "Rectangle.php";
 class Square extends Rectangle
 {
 
+    private $height;
+    private $width;
+
 	public function __construct($height)
 	{
 		$width = $height;
