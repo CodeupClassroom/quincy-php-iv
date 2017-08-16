@@ -20,8 +20,11 @@ array_shift($parks);
 $parks = array_map('trim', $parks);
 
 foreach($parks as $park) {
-    $park = explode(",", $park);
 
+    $park = explode(",", $park);
+    var_dump($park);
+    die();
+    
     $parkObject = new Park();
     $parkObject->name = $park[0];
     $parkObject->location = $park[1];
