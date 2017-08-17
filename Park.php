@@ -1,58 +1,16 @@
 <?php
 require_once __DIR__ . "/park_logins.php";
-/**
- * A Class for interacting with the national_parks database table
- *
- * contains static methods for retrieving records from the database
- * contains an instance method for persisting a record to the database
- *
- * Usage Examples
- *
- * Retrieve a list of parks and display some values for each record
- *
- *      $parks = Park::all();
- *      foreach($parks as $park) {
- *          echo $park->id . PHP_EOL;
- *          echo $park->name . PHP_EOL;
- *          echo $park->description . PHP_EOL;
- *          echo $park->areaInAcres . PHP_EOL;
- *      }
- * 
- * Inserting a new record into the database
- *
- *      $park = new Park();
- *      $park->name = 'Acadia';
- *      $park->location = 'Maine';
- *      $park->areaInAcres = 48995.91;
- *      $park->dateEstablished = '1919-02-26';
- *
- *      $park->insert();
- *
- */
-class Park
+require_once __DIR__ . "/Model.php";
+
+
+class Park extends Model
 {
 
     ///////////////////////////////////
     // Static Methods and Properties //
     ///////////////////////////////////
 
-    /**
-     * our connection to the database
-     */
-    public static $connection = null;
-
-    /**
-     * establish a database connection if we do not have one
-     */
-    public static function dbConnect() {
-        
-        require 'db_connect.php';
-
-        if (! is_null(self::$connection)) {
-            return;
-        }
-        self::$connection = $connection;
-    }
+    public static $table = "parks";
 
     /**
      * returns the number of records in the database
@@ -152,27 +110,11 @@ class Park
     // Instance Methods and Properties //
     /////////////////////////////////////
 
-    /**
-     * properties that represent columns from the database
-     */
-    public $id;
-    public $name;
-    public $location;
-    public $dateEstablished;
-    public $areaInAcres;
-    public $description;
 
     /**
      * inserts a record into the database
      */
-    public function insert() {
-        // TODO: call dbConnect to ensure we have a database connection
-        // TODO: use the $connection static property to create a perpared statement for
-        //       inserting a record into the parks table
-        // TODO: use the $this keyword to bind the values from this object to
-        //       the prepared statement
-        // TODO: excute the statement and set the $id property of this object to
-        //       the newly created id
+    protected function insert() {
 
         self::dbConnect();
 
@@ -182,11 +124,53 @@ class Park
 
         $stmt->bindValue(":name", $this->name, PDO::PARAM_STR);
         $stmt->bindValue(":location", $this->location, PDO::PARAM_STR);
-        $stmt->bindValue(":date_established", $this->dateEstablished, PDO::PARAM_STR);
-        $stmt->bindValue(":area_in_acres", $this->areaInAcres, PDO::PARAM_STR);
+        $stmt->bindValue(":date_established", $this->date_established, PDO::PARAM_STR);
+        $stmt->bindValue(":area_in_acres", $this->area_in_acres, PDO::PARAM_STR);
         $stmt->bindValue(":description", $this->description, PDO::PARAM_STR);
     
         $stmt->execute();
         $this->id = self::$connection->lastInsertId();
+    }
+
+    protected function update()
+    {
+        self::dbConnect();
+
+        $update = "UPDATE " . static::$table . " SET 
+            name = :name,
+            location = :location,
+            area_in_acres = :area_in_acres,
+            date_established = :date_established,
+            description = :description
+            WHERE id = :id";
+
+        $statement = self::$connection->prepare($update);
+
+        $statement->bindValue(":name", $this->name, PDO::PARAM_STR);
+        $statement->bindValue(":location", $this->location, PDO::PARAM_STR);
+        $statement->bindValue(":date_established", $this->date_established, PDO::PARAM_STR);
+        $statement->bindValue(":area_in_acres", $this->area_in_acres, PDO::PARAM_STR);
+        $statement->bindValue(":description", $this->description, PDO::PARAM_STR);
+        $statement->bindValue(':id', $this->id, PDO::PARAM_INT);
+
+        $statement->execute();
+
+    }
+
+    public static function find($id)
+    {
+        self::dbConnect();
+        $query = "SELECT * from " . static::$table . " where id = :id";
+        $statement = self::$connection->prepare($query);
+
+        $statement->bindValue(':id', $id, PDO::PARAM_INT);
+        $statement->execute();
+
+        $result = $statement->fetch(PDO::FETCH_ASSOC);
+
+        $park = new Park($result);
+        
+        return $park;
+
     }
 }
