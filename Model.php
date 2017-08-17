@@ -1,32 +1,111 @@
 <?php
 
-class Model
+abstract class Model
 {
-    protected static $table = "";
-    
-    // Array to store our key/value data
-    private $data = [];
+    /** @var PDO|null Connection to the database */
+    protected static $connection = null;
 
-    // Magic setter to populate $data array
-    public function __set($name, $value)
+    /** @var array Database values for a single record. Array keys should be column names in the DB */
+    protected $attributes = array();
+
+    /**
+     * Constructor
+     *
+     * An instance of a class derived from Model represents a single record in the database.
+     *
+     * $param array $attributes Optional array of database values to initialize the model record with
+     */
+    public function __construct(array $attributes = array())
     {
-        // Set the $name key to hold $value in $data
-        $this->data[$name] = $value;
+        self::dbConnect();
+
+        $this->attributes = $attributes;
     }
 
-    // Magic getter to retrieve values from $data
-    public function __get($name)
+    /**
+     * Connect to the DB
+     *
+     * This method should be called at the beginning of any function that needs to communicate with the database
+     */
+    protected static function dbConnect()
     {
-        // Check for existence of array key $name
-        if (array_key_exists($name, $this->data)) {
-            return $this->data[$name];
+        require 'db_connect.php';
+
+        if (! is_null(self::$connection)) {
+            return;
         }
 
-        return null;
+        self::$connection = $connection;
     }
 
-    public static function getTableName()
+    /**
+     * Get a value from attributes based on its name
+     *
+     * @param string $name key for attributes array
+     *
+     * @return mixed|null value from the attributes array or null if it is undefined
+     */
+    public function __get($name)
     {
-        return static::$table;
+        // @TODO: Return the value from attributes for $name if it exists, else return null
+        if(isset($this->attributes[$name])) {
+            return $this->attributes[$name];
+        } else {
+            return null;
+        }
     }
+
+    /**
+     * Set a new value for a key in attributes
+     *
+     * @param string $name  key for attributes array
+     * @param mixed  $value value to be saved in attributes array
+     */
+    public function __set($name, $value)
+    {
+        // @TODO: Store name/value pair in attributes array
+        $this->attributes[$name] = $value;
+    }
+
+    /** Store the object in the database */
+    public function save()
+    {
+        // @TODO: Ensure there are values in the attributes array before attempting to save
+        if(!empty($this->attributes)) {
+
+            if(isset($this->attributes['id'])) {
+                $this->update();
+            } else {
+                $this->insert();
+            }
+        }
+        // @TODO: Call the proper database method: if the `id` is set this is an update, else it is a insert
+    }
+
+    public function delete()
+    {
+        self::dbConnect();
+        $delete = "DELETE from " . static::$table . " WHERE id = :id";
+
+        $statement = self::$connection->prepare($delete);
+
+        $statement->bindValue(':id', $this->id, PDO::PARAM_INT);
+        
+        $statement->execute();
+
+    }
+
+    /**
+     * Insert new entry into database
+     *
+     * NOTE: Because this method is abstract, any child class MUST have it defined.
+     */
+    protected abstract function insert();
+
+    /**
+     * Update existing entry in database
+     *
+     * NOTE: Because this method is abstract, any child class MUST have it defined.
+     */
+    protected abstract function update();
 }

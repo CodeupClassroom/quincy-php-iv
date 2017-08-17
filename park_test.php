@@ -2,56 +2,26 @@
 
 require_once "Park.php";
 
-// test dbConnect() and Park::$connection
+// $parkArray = [
+// 	'name' => 'Glacier National Park',
+// 	'location' => 'Montana',
+// 	'area_in_acres' => 7000,
+// 	'date_established' => '1912-01-01',
+// 	'description' => 'Ask Justin for photos'
+// ];
 
-	// Park::dbConnect();
-	// var_dump(Park::$connection);
+// $park = new Park($parkArray);
 
-
-// test Park::count()
-	
-	// echo "There are " . Park::count() . " parks in the parks table.";
-
-
-// test Park::all()
-
-	// var_dump(Park::all());
-
-	// $allParks = Park::all();
-
-	// echo "Park 1 details..." . PHP_EOL;
-	// echo $allParks[0]->id . PHP_EOL;
-	// echo $allParks[0]->name . PHP_EOL;
-	// echo $allParks[0]->location . PHP_EOL;
-	// echo $allParks[0]->dateEstablished . PHP_EOL;
-	// echo $allParks[0]->areaInAcres . PHP_EOL;
-	// echo $allParks[0]->description . PHP_EOL;
+// $park->save();
 
 
 
-// test Park::paginate()
+// $anotherPark = Park::find(2);
+// $anotherPark->description = "Really awesome park is awesome and parky";
 
-	// print_r(Park::paginate(1));
-	// print_r(Park::paginate(2));
-	// print_r(Park::paginate(2, 2));
-	// print_r(Park::paginate(1, 8));
+// $anotherPark->save();
 
 
-
-// test inserting a new park
-
-$park = new Park();
-
-$park->name = "Frio River Park";
-$park->location = "Texas";
-$park->areaInAcres = 700;
-$park->dateEstablished = '1913-02-02';
-$park->description = 'Yadda yadda';
-$park->insert();
-
-echo $park->id;
-
-
-
-
+$park = Park::find(1);
+$park->delete();
 
