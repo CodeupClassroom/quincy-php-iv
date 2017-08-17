@@ -21,7 +21,7 @@ require_once "Square.php";
 
 
 $square = new Square(7);
-echo "The area of a square with a height of " 
-    . $square->height . " and width of "
-    . $square->width . " is " . $square->area()
+
+echo "The area of a square with height of " . $square->getHeight() 
+    . " and width of " . $square->getWidth() . " is " . $square->area()
     . " and the perimeter is " . $square->perimeter() . PHP_EOL;

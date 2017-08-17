@@ -187,18 +187,6 @@ class Park
         $stmt->bindValue(":description", $this->description, PDO::PARAM_STR);
     
         $stmt->execute();
-
         $this->id = self::$connection->lastInsertId();
-
-
-
-
-
-
-
-
-
-
-
     }
 }
